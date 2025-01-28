@@ -16,7 +16,7 @@ namespace Dashboard_Management.Services
         {
             return await _energyRepository.GetEnergyConsumptionAsync(startDate, endDate);
         }
-        public async Task<List<EnergyMetricResponseDto>> GetMetricsAsync(MetricRequestDto request)
+        public async Task<IEnumerable<EnergyMetricResponseDto>> GetMetricsAsync(MetricRequestDto request)
         {
             return await _energyRepository.GetMetricsAsync(request);
         }
