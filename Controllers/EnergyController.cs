@@ -1,10 +1,11 @@
 ﻿using Dashboard_Management.DTOs;
 using Dashboard_Management.Interfaces;
-using Dashboard_Management.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Dashboard_Management.Controllers
 {
+    [Authorize(Policy = "DashboardAdminPolicy")]
     [ApiController]
     [Route("api/[controller]")]
     public class EnergyController : ControllerBase
@@ -19,6 +20,20 @@ namespace Dashboard_Management.Controllers
         [HttpPost("energy-consumption")]
         public async Task<IActionResult> GetEnergyConsumption([FromBody] EnergyConsumptionRequestDto request)
         {
+            Console.WriteLine($"Dashboard Admin: {User.IsInRole("Dashboard-Admin")}");
+            Console.WriteLine($"default-roles-alti-ems: {User.IsInRole("default-roles-alti-ems")}");
+            Console.WriteLine($"offline_access: {User.IsInRole("offline_access")}");
+            Console.WriteLine($"uma_authorization: {User.IsInRole("uma_authorization")}");
+            Console.WriteLine($"manage-account: {User.IsInRole("manage-account")}");
+            Console.WriteLine($"manage-account-links: {User.IsInRole("manage-account-links")}");
+
+            var claims = User.Claims.Select(c => new { c.Type, c.Value }).ToList();
+
+            foreach (var claim in claims)
+            {
+                Console.WriteLine($"{claim.Type} {claim.Value}");
+            }
+
             if (!ModelState.IsValid)
             {
                 return BadRequest(new ApiResponse<string>
