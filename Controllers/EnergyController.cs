@@ -19,7 +19,7 @@ namespace Dashboard_Management.Controllers
         [HttpPost("energy-consumption")]
         public async Task<IActionResult> GetEnergyConsumption([FromBody] EnergyConsumptionRequestDto request)
         {
-            var result = await _energyService.GetEnergyConsumptionAsync(request.StartDate, request.EndDate);
+            var result = await _energyService.GetEnergyConsumptionAsync(request);
 
             return Ok(new ApiResponse<IEnumerable<BuildingEnergyConsumptionDto>>
             {

@@ -38,11 +38,11 @@ namespace Dashboard_Management.Models
         [Column("renewable_usage_pct")]
         public decimal RenewableUsagePct { get; set; }
 
-        [Column("area_id")]
-        public int AreaId { get; set; }
+        //[Column("area_id")]
+        //public int AreaId { get; set; }
 
-        [ForeignKey("AreaId")]
-        public Area Area { get; set; }
+        //[ForeignKey("AreaId")]
+        //public Area Area { get; set; }
 
         public ICollection<Floor> Floors { get; set; }
     }

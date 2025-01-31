@@ -4,7 +4,7 @@ namespace Dashboard_Management.Interfaces
 {
     public interface IEnergyService
     {
-        Task<IEnumerable<BuildingEnergyConsumptionDto>> GetEnergyConsumptionAsync(DateTime startDate, DateTime endDate);
+        Task<IEnumerable<BuildingEnergyConsumptionDto>> GetEnergyConsumptionAsync(EnergyConsumptionRequestDto request);
         Task<IEnumerable<EnergyMetricResponseDto>> GetMetricsAsync(MetricRequestDto request);
 
     }
