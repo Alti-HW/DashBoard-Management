@@ -15,7 +15,6 @@ namespace Dashboard_Management.Validators.Energy
                 .NotEmpty().WithMessage(ValidationMessages.StartDateRequired);
 
             RuleFor(x => x.EndDate)
-                .NotEmpty().WithMessage(ValidationMessages.EndDateRequired)
                 .GreaterThan(x => x.StartDate).WithMessage(ValidationMessages.EndDateGreaterThanStartDate);
         }
     }

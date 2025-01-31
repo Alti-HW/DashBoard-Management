@@ -12,9 +12,9 @@ namespace Dashboard_Management.Services
             _energyRepository = energyRepository;
         }
 
-        public async Task<IEnumerable<BuildingEnergyConsumptionDto>> GetEnergyConsumptionAsync(DateTime startDate, DateTime endDate)
+        public async Task<IEnumerable<BuildingEnergyConsumptionDto>> GetEnergyConsumptionAsync(EnergyConsumptionRequestDto request)
         {
-            return await _energyRepository.GetEnergyConsumptionAsync(startDate, endDate);
+            return await _energyRepository.GetEnergyConsumptionAsync(request);
         }
         public async Task<IEnumerable<EnergyMetricResponseDto>> GetMetricsAsync(MetricRequestDto request)
         {
