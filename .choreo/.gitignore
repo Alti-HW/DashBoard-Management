@@ -1,0 +1,37 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs
+/obj/Release/net8.0
+*.user
+/Dashboard_Management.csproj.Backup.tmp
+
+
+# Build artifacts
+bin/
+obj/
+
+# User-specific files
+*.csproj.user
+*.csproj.backup
+*.suo
+
+# Visual Studio
+.vs/
+
+# Logs
+*.log
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Secrets
+appsettings.Local.json
+
+# Node.js dependencies (if applicable)
+node_modules/
+
+# Rider IDE files
+.idea/
