@@ -7,6 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove=".choreo\**" />
+    <Content Remove=".choreo\**" />
+    <EmbeddedResource Remove=".choreo\**" />
+    <None Remove=".choreo\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.1" />
@@ -22,10 +29,6 @@
   <ItemGroup>
     <Folder Include="Filters\" />
     <Folder Include="Tests\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include=".choreo\Component.yaml" />
   </ItemGroup>
 
 </Project>
