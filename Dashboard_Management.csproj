@@ -24,4 +24,8 @@
     <Folder Include="Tests\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include=".choreo\Component.yaml" />
+  </ItemGroup>
+
 </Project>
