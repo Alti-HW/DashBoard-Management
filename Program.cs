@@ -56,11 +56,11 @@ app.UseCors("AllowAll");
 
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
+//if (app.Environment.IsDevelopment())
+//{
     app.UseSwagger();
     app.UseSwaggerUI();
-}
+//}
 
 // Register custom exception middleware
 app.UseMiddleware<ExceptionMiddleware>();
