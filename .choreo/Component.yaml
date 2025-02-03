@@ -2,7 +2,7 @@ schemaVersion: "Dashboard-02-03-2025"
 name: "dashboard-management"
 runtime: "DOTNET"
 source:
-  location: "."
+  location: "DashBoard-Management/.choreo/"
 build:
   command: "dotnet build --configuration Release"
 deploy:
