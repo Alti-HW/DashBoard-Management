@@ -10,10 +10,10 @@ namespace Dashboard_Management.DTOs
     {
         [Required]
         [DefaultValue("2025-01-22")]
-        public DateOnly? StartDate { get; set; }
+        public DateTime? StartDate { get; set; }
 
         [DefaultValue(null)]
-        public DateOnly? EndDate { get; set; }
+        public DateTime? EndDate { get; set; }
         [DefaultValue(null)]
         public int? BuildingId { get; set; } // Optional filter for building
         [DefaultValue(null)]

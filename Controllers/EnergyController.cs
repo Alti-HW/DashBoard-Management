@@ -1,4 +1,5 @@
-﻿using Dashboard_Management.Constants;
+﻿using System.Diagnostics;
+using Dashboard_Management.Constants;
 using Dashboard_Management.DTOs;
 using Dashboard_Management.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -19,7 +20,13 @@ namespace Dashboard_Management.Controllers
         [HttpPost("energy-consumption")]
         public async Task<IActionResult> GetEnergyConsumption([FromBody] EnergyConsumptionRequestDto request)
         {
+            Stopwatch stopwatch = Stopwatch.StartNew();
+
             var result = await _energyService.GetEnergyConsumptionAsync(request);
+
+            stopwatch.Stop();
+            Console.WriteLine($"Elapsed time: {stopwatch.ElapsedMilliseconds} ms");
+            Console.WriteLine($"Elapsed time: {stopwatch.Elapsed.TotalSeconds} seconds");
 
             return Ok(new ApiResponse<IEnumerable<BuildingEnergyConsumptionDto>>
             {

@@ -2,8 +2,11 @@
 using Azure.Core;
 using Dashboard_Management.Data;
 using Dashboard_Management.DTOs;
+using Dashboard_Management.Extensions;
 using Dashboard_Management.Interfaces;
+using Dashboard_Management.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.EntityFrameworkCore.Storage.Json;
 
 namespace Dashboard_Management.Repositories
@@ -21,63 +24,86 @@ namespace Dashboard_Management.Repositories
         {
             try
             {
-                var query = _context.Buildings
-                    .Where(b => !request.BuildingId.HasValue || b.BuildingId == request.BuildingId) // Apply BuildingId filter if given
-                    .Select(b => new BuildingEnergyConsumptionDto
+                var query =
+                        from ec in _context.EnergyConsumptions
+                        join b in _context.Buildings
+
+                        //from b in _context.Buildings
+                        //join ec in _context.EnergyConsumptions
+                        //on b.BuildingId equals ec.Floor.BuildingId
+                        on ec.Floor.BuildingId equals b.BuildingId
+                        where (request.BuildingId.HasValue && b.BuildingId == request.BuildingId) &&
+                                  (request.FloorId.HasValue && ec.Floor.FloorId == request.FloorId) &&
+                                  (request.EndDate != null
+                                        ? ec.Timestamp >= request.StartDate.StartOfDay() &&
+                                          ec.Timestamp <= request.EndDate.EndOfDay()
+                                        : ec.Timestamp >= request.StartDate.StartOfDay() &&
+                                          ec.Timestamp <= request.StartDate.EndOfDay())
+                        select new
+                        {
+                            BuildingId = b.BuildingId,
+                            BuildingName = b.Name,
+                            FloorId = ec.FloorId,
+                            FloorNumber = ec.Floor.FloorNumber,
+                            EnergyConsumedKwh = ec.EnergyConsumedKwh,
+                            ConsumptionId = ec.ConsumptionId,
+                            Timestamp = ec.Timestamp,
+                            PeakLoadKw = ec.PeakLoadKw,
+                            AvgTemperatureC = ec.AvgTemperatureC,
+                            Co2EmissionsKg = ec.Co2EmissionsKg,
+                        };
+
+                var buildings = await query.ToListAsync();
+
+                var floorConsumptionsLookup = buildings
+                    .GroupBy(b => new { b.FloorId, b.FloorNumber, b.BuildingId })
+                    .ToDictionary(g => g.Key, g => new
                     {
-                        BuildingId = b.BuildingId,
-                        BuildingName = b.Name,
-
-                        // TotalEnergyConsumedKwh calculation
-                        TotalEnergyConsumedKwh = Math.Round(
-                            _context.EnergyConsumptions
-                                .Where(ec => ec.Floor.BuildingId == b.BuildingId &&
-                                             // Apply FloorId filter if provided
-                                             (!request.FloorId.HasValue || ec.Floor.FloorId == request.FloorId) &&
-                                             // Apply exact date match when only StartDate is provided
-                                             (request.EndDate != null
-                                                 ? DateOnly.FromDateTime(ec.Timestamp.Date) >= request.StartDate &&
-                                                   DateOnly.FromDateTime(ec.Timestamp.Date) <= request.EndDate
-                                                 : DateOnly.FromDateTime(ec.Timestamp.Date) == request.StartDate) // Exact match for StartDate
-                                )
-                                .Sum(ec => (decimal?)ec.EnergyConsumedKwh) ?? 0, 2),  // Handle nulls
-
-                        // FloorConsumptions calculation
-                        FloorConsumptions = request.BuildingId.HasValue // Only calculate floor consumptions if BuildingId is provided
-                            ? _context.EnergyConsumptions
-                                .Where(ec => ec.Floor.BuildingId == b.BuildingId &&
-                                             // Apply FloorId filter if provided
-                                             (!request.FloorId.HasValue || ec.Floor.FloorId == request.FloorId) &&
-                                             // Apply exact date match when only StartDate is provided
-                                             (request.EndDate != null
-                                                 ? DateOnly.FromDateTime(ec.Timestamp.Date) >= request.StartDate &&
-                                                   DateOnly.FromDateTime(ec.Timestamp.Date) <= request.EndDate
-                                                 : DateOnly.FromDateTime(ec.Timestamp.Date) == request.StartDate))  // Exact match for StartDate
-                                .GroupBy(ec => new { ec.Floor.FloorId, ec.Floor.FloorNumber }) // Group by FloorId & FloorNumber
-                                .Select(g => new FloorEnergyConsumptionDto
-                                {
-                                    FloorId = g.Key.FloorId, // Include FloorId in response
-                                    FloorNumber = g.Key.FloorNumber,
-                                    EnergyConsumedKwh = Math.Round(g.Sum(ec => (decimal?)ec.EnergyConsumedKwh) ?? 0, 2),
-                                    // Floor details list
-                                    FloorDetails = g.Select(ec => new EnergyConsumptionDetailDto
-                                    {
-                                        ConsumptionId = ec.ConsumptionId,
-                                        FloorId = ec.FloorId,
-                                        Timestamp = ec.Timestamp,
-                                        EnergyConsumedKwh = ec.EnergyConsumedKwh,
-                                        PeakLoadKw = ec.PeakLoadKw,
-                                        AvgTemperatureC = ec.AvgTemperatureC,
-                                        Co2EmissionsKg = ec.Co2EmissionsKg,
-                                        CostPerUnit = 23,
-                                        TotalCost = ec.EnergyConsumedKwh * 23
-                                    }).ToList()
-                                })
-                                .ToList()
-                            : new List<FloorEnergyConsumptionDto>() // Empty if no BuildingId
+                        FloorId = g.Key.FloorId,
+                        FloorNumber = g.Key.FloorNumber,
+                        BuildingId = g.Key.BuildingId,
+                        EnergyConsumedKwh = Math.Round(g.Sum(ec => (decimal?)ec.EnergyConsumedKwh) ?? 0, 2),
+                        FloorDetails = g.Select(b => new EnergyConsumptionDetailDto
+                        {
+                            ConsumptionId = b.ConsumptionId,
+                            FloorId = b.FloorId,
+                            Timestamp = b.Timestamp,
+                            EnergyConsumedKwh = b.EnergyConsumedKwh,
+                            PeakLoadKw = b.PeakLoadKw,
+                            AvgTemperatureC = b.AvgTemperatureC,
+                            Co2EmissionsKg = b.Co2EmissionsKg,
+                            CostPerUnit = 23,
+                            TotalCost = b.EnergyConsumedKwh * 23
+                        }).ToList()
                     });
 
-                return await query.ToListAsync();
+                var result = buildings
+                    .GroupBy(b => new { b.BuildingId, b.BuildingName })
+                    .Select(b => new BuildingEnergyConsumptionDto
+                    {
+                        BuildingId = b.Key.BuildingId,
+                        BuildingName = b.Key.BuildingName,
+                        TotalEnergyConsumedKwh = Math.Round(b.Sum(c => (decimal?)c.EnergyConsumedKwh ?? 0), 2),
+                        FloorConsumptions = b.GroupBy(f => new { f.FloorId, f.FloorNumber })
+                            .Select(f =>
+                            {
+                                var key = new { f.Key.FloorId, f.Key.FloorNumber, b.Key.BuildingId };
+                                var floorData = floorConsumptionsLookup.GetValueOrDefault(key);
+
+                                return new FloorEnergyConsumptionDto
+                                {
+                                    FloorId = f.Key.FloorId,
+                                    FloorNumber = f.Key.FloorNumber,
+                                    EnergyConsumedKwh = floorData?.EnergyConsumedKwh ?? 0,
+                                    FloorDetails = floorData?.FloorDetails ?? new List<EnergyConsumptionDetailDto>()
+                                };
+                            })
+                            .ToList(),
+                    })
+                    .ToList();
+
+                return result;
+
             }
             catch (Exception ex)
             {

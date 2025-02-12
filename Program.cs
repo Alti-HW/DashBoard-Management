@@ -50,6 +50,7 @@ builder.Services.AddCors(options =>
         });
 });
 var app = builder.Build();
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 // Enable CORS
 app.UseCors("AllowAll");
