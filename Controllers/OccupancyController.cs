@@ -3,9 +3,11 @@ using Dashboard_Management.DTOs.Occupancy;
 using Dashboard_Management.DTOs;
 using Dashboard_Management.Interfaces.Occupancy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 [Route("api/occupancy")]
 [ApiController]
+[Authorize]
 public class OccupancyController : ControllerBase
 {
     private readonly IOccupancyService _occupancyService;

@@ -1,12 +1,7 @@
-schemaVersion: "Dashboard-02-03-2025"
-name: "dashboard-management"
-runtime: "DOTNET"
-source:
-  location: "."
-build:
-  command: "dotnet build --configuration Release"
-deploy:
-  command: "dotnet bin/Release/net8.0/win-x64/Dashboard_Management.dll"
-  env:
-    - name: "ASPNETCORE_URLS"
-      value: "http://+:8080"
+schemaVersion: 1.0 
+ # Example endpoint configuration
+endpoints:
+- name: my-service-endpoint
+  service:
+     port: 6000
+  type: REST

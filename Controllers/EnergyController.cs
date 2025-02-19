@@ -1,12 +1,14 @@
 ﻿using Dashboard_Management.Constants;
 using Dashboard_Management.DTOs;
 using Dashboard_Management.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Dashboard_Management.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class EnergyController : ControllerBase
     {
         private readonly IEnergyService _energyService;

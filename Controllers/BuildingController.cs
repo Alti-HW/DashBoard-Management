@@ -5,12 +5,14 @@ using Dashboard_Management.DTOs;
 using Dashboard_Management.DTOs.Building;
 using Dashboard_Management.Interfaces;
 using Dashboard_Management.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Dashboard_Management.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class BuildingController : ControllerBase
     {
         private readonly IBuildingService _buildingService;
