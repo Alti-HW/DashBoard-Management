@@ -108,10 +108,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 // Read the URL from appsettings.json
-//var kestrelSection = builder.Configuration.GetSection("Kestrel:Endpoints:Http:Url");
-//var url = kestrelSection.Value ?? "http://localhost:5000"; // Default if not set
+var kestrelSection = builder.Configuration.GetSection("Kestrel:Endpoints:Http:Url");
+var url = kestrelSection.Value ?? "http://localhost:5000"; // Default if not set
 
-//builder.WebHost.UseUrls(url); // Correct way to set URL
+builder.WebHost.UseUrls(url); // Correct way to set URL
 var app = builder.Build();
 
 // Enable CORS
