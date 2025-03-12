@@ -1,4 +1,3 @@
-using System.IO;
 using Dashboard_Management.Data;
 using Dashboard_Management.DTOs;
 using Dashboard_Management.Helpers;
@@ -11,7 +10,6 @@ using Dashboard_Management.Validators.Energy;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -21,28 +19,28 @@ var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 
 // Add services to the container.
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
 
-// Database configuration
+builder.Services.AddControllers();
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-// Register services and repositories
 builder.Services.AddScoped<IEnergyService, EnergyService>();
 builder.Services.AddScoped<IEnergyRepository, EnergyRepository>();
 builder.Services.AddScoped<IBuildingRepository, BuildingRepository>();
 builder.Services.AddScoped<IBuildingService, BuildingService>();
+// Register Occupancy Service & Repository
 builder.Services.AddScoped<IOccupancyRepository, OccupancyRepository>();
 builder.Services.AddScoped<IOccupancyService, OccupancyService>();
-
-// FluentValidation
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddFluentValidationClientsideAdapters();
+
+// Manually register individual validators
 builder.Services.AddTransient<IValidator<EnergyConsumptionRequestDto>, EnergyConsumptionRequestValidator>();
 builder.Services.AddTransient<IValidator<MetricRequestDto>, MetricRequestValidator>();
 
-// Swagger configuration
+
+
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo
@@ -52,6 +50,7 @@ builder.Services.AddSwaggerGen(c =>
         Description = "DashBoard Management API",
     });
 
+    // Enable JWT Authentication in Swagger
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -77,8 +76,7 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 });
-
-// CORS Policy
+// Add CORS policy
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll",
@@ -86,12 +84,13 @@ builder.Services.AddCors(options =>
         {
             builder.AllowAnyOrigin()
                    .AllowAnyMethod()
-                   .AllowAnyHeader();
+            .AllowAnyHeader();
         });
 });
 
-// Keycloak Authentication
+
 var keycloakConfig = configuration.GetSection(KeyCloakConfiguration.Section).Get<KeyCloakConfiguration>();
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -108,25 +107,25 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-// Data Protection (Fix for warnings)
-builder.Services.AddDataProtection()
-    .PersistKeysToFileSystem(new DirectoryInfo("/app/keys"))
-    .SetApplicationName("DashboardManagement");
+// Read the URL from appsettings.json
+//var kestrelSection = builder.Configuration.GetSection("Kestrel:Endpoints:Http:Url");
+//var url = kestrelSection.Value ?? "http://localhost:5000"; // Default if not set
 
-// Set Port from Environment Variable
-var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
-builder.WebHost.UseUrls($"http://*:{port}");
-
+//builder.WebHost.UseUrls(url); // Correct way to set URL
 var app = builder.Build();
 
 // Enable CORS
 app.UseCors("AllowAll");
 
-// Enable Swagger (Available in Production)
-app.UseSwagger();
-app.UseSwaggerUI();
 
-// Exception Middleware
+// Configure the HTTP request pipeline.
+//if (app.Environment.IsDevelopment())
+//{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+//}
+
+// Register custom exception middleware
 app.UseMiddleware<ExceptionMiddleware>();
 
 app.UseHttpsRedirection();
@@ -136,15 +135,4 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-// Logging & Startup Check
-var logger = app.Services.GetRequiredService<ILogger<Program>>();
-try
-{
-    logger.LogInformation("Starting application on port {Port}", port);
-    app.Run();
-}
-catch (Exception ex)
-{
-    logger.LogCritical(ex, "Application failed to start due to an unhandled exception");
-    throw;
-}
+app.Run();

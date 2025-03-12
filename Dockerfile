@@ -27,9 +27,6 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 
-# Create directory for persisting Data Protection keys
-RUN mkdir -p /app/keys
-
 # Ensure the correct user permissions (especially for Railway)
 USER root
 
