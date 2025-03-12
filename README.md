@@ -40,7 +40,7 @@ You can connect to **Aiven's PostgreSQL database** using **pgAdmin** or any SQL 
 
 
 ## References
-[Technical Documentation](https://o365altimetrik-my.sharepoint.com/:w:/g/personal/bdileep_altimetrik_com/EWaLz3ceQPhDr7sOnucyyhUBnXI6el3--F4PjTQhm6Pp0Q?e=h3mdet)
+[Technical Documentation](https://o365altimetrik-my.sharepoint.com/:w:/g/personal/btanti_altimetrik_com/Ec6KGmhPKhhLkuqLttwZ3cUBPr2gOTirBo_5-4VFPoCIFg?e=KWyZKx)
 
 
 
