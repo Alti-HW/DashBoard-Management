@@ -1,48 +1,75 @@
-# DashBoard-Management
+# Consolidated README - DashBoard Management
 
 ## Overview
-DashBoard Management is a .NET Core-based web API designed to manage building, energy, and occupancy data. It integrates with Keycloak for authentication and uses PostgreSQL as the database.
+DashBoard Management is a .NET Core-based web API designed to handle building, energy, and occupancy data. It integrates with **PostgreSQL** for database storage and **Keycloak** for authentication.
 
 ## Pre-requisites
-- **.NET SDK 6 or later**  
-- **Visual Studio or Visual Studio Code** (for development and debugging)  
-- **PostgreSQL database**  
-- **Keycloak authentication server**  
-- **Aiven Cloud PostgreSQL** (for cloud database hosting)  
+Ensure you have the following installed before proceeding:
 
-## Setting Up the Application
+- **.NET SDK 6 or later** - Required to run the .NET services.
+- **PostgreSQL Database** - Used for data storage.
+- **Keycloak Authentication Server** - Used for securing API endpoints.
+- **Docker** (Optional) - For running Keycloak or PostgreSQL containers.
 
-### Install Dependencies
-1. Install .NET SDK from [Microsoft .NET](https://dotnet.microsoft.com/download)
-2. Install PostgreSQL  
-3. Install **Visual Studio** or **Visual Studio Code**:
-   - **Visual Studio**: Download from [Visual Studio](https://visualstudio.microsoft.com/)
-   - **Visual Studio Code**: Download from [VS Code](https://code.visualstudio.com/)
-4. Open the project in Visual Studio and restore dependencies:
+## Database Configuration
+The application uses **Aiven Cloud PostgreSQL** as the database. The connection details are stored in `appsettings.json`.
+
+### Connection Strings:
+```json
+"ConnectionStrings": {
+    "DefaultConnection": "Host=pg-1c707a6d-basamdileepkumar-9fe8.d.aivencloud.com;Port=26900;Username=avnadmin;Password=AVNS__6UJ9rVOAAkzZi6LUJ6;Database=EMS_HoneyWell;SSL Mode=Require"
+}
+```
+
+### Connecting to PostgreSQL
+You can connect to this database using **pgAdmin** or any SQL client with the credentials provided in `appsettings.json`.
+
+## Running the Application
+1. **Set up PostgreSQL** with the given connection string.
+2. **Restore dependencies**:
    ```sh
    dotnet restore
-## Configure the Database
+   ```
+3. **Run the application**:
+   ```sh
+   dotnet run
+   ```
+   The API will be available at:
+   ```
+   http://localhost:5050
+   ```
 
-The application uses **Aiven Cloud PostgreSQL** for database hosting. The connection string for Aiven is stored in the `appsettings.json` file.
+## Keycloak Authentication Setup
+The application uses **Keycloak** for authentication. The configuration is stored in `appsettings.json`.
 
-### Update Connection String
-Open `appsettings.json` and update the **PostgreSQL connection string** with the credentials from your **Aiven Cloud Console**:
-    
-## Connecting to Aiven Cloud PostgreSQL
+### Keycloak Configuration:
+```json
+"KeycloakService": {
+    "Realm": "Alti-EMS",
+    "ClientId": "EMS",
+    "ClientSecret": "q66B31Pde4NfC9LNM6EULSGOzfRJj0Re",
+    "TokenUrl": "http://localhost:8080/realms/Alti-EMS/protocol/openid-connect/token",
+    "ServerUrl": "http://localhost:8080",
+    "Username": "mvgokul@altimetrik.com",
+    "Password": "123"
+}
+```
 
-You can connect to **Aiven's PostgreSQL database** using **pgAdmin** or any SQL client with the connection details provided in `appsettings.json`.
+### Running Keycloak:
+If running Keycloak locally, start the server with Docker:
+```sh
+docker run -p 8080:8080 -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=admin quay.io/keycloak/keycloak:latest start-dev
+```
+Access Keycloak Admin Console at:
+```
+http://localhost:8080/admin
+```
 
-## Viewing Databases and Tables in Aiven Cloud Console
+## Summary
+1. Set up **PostgreSQL** with the provided credentials.
+2. Ensure **Keycloak** is running and properly configured.
+3. Start the **.NET API** on port **5050**.
+4. The application will be ready for authentication and data management.
 
-1. Log in to your **Aiven** account.  
-2. Select your **PostgreSQL service**.  
-3. Navigate to the **Database** section to explore the tables. 
+This setup ensures seamless integration between database storage, authentication, and API functionalities.
 
-
-## References
-[Technical Documentation](https://o365altimetrik-my.sharepoint.com/:w:/g/personal/bdileep_altimetrik_com/EWaLz3ceQPhDr7sOnucyyhUBnXI6el3--F4PjTQhm6Pp0Q?e=h3mdet)
-
-
-
-
- 
